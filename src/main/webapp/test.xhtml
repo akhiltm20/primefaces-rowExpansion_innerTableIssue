@@ -5,17 +5,168 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:h="http://xmlns.jcp.org/jsf/html">
 
-    <h:head>
-        <title>PrimeFaces Test</title>
-        <h:outputScript name="test.js" />
-        <h:outputStylesheet name="test.css" />
-    </h:head>
-    <h:body>
+<h:head>
+    <title>PrimeFaces Test</title>
+    <h:outputScript name="test.js"/>
+    <h:outputStylesheet name="test.css"/>
+</h:head>
+<h:body>
 
-        <h1>#{testView.string}</h1>
-        <h:form id="frmTest">
-            
-        </h:form>
+    <h1>#{testView.string}</h1>
+    <h:form id="form">
 
-    </h:body>
+
+        <div class="card">
+            <h5>Row Editing</h5>
+            <p:dataTable id="order" var="order" value="#{mainBean.orderVOs}"
+                         editable="true" style="margin-bottom:20px" styleClass="myclass"
+                         rowKey="#{order.orderNo}" rowIndexVar="orderIndex" showGridlines="true">
+
+
+                <p:ajax event="rowEdit" listener="#{mainBean.onRowEdit(order)}"
+                        update=":form:order"/>
+                <p:ajax event="rowEditCancel"
+                        listener="#{mainBean.onRowCancel(order)}" update=":form:order"/>
+
+                <p:column style="width:2rem">
+                    <p:rowToggler/>
+                </p:column>
+
+
+                <p:column style="width:6rem">
+
+                    <f:facet name="header">
+
+                        <p:commandButton value="+"
+                                         styleClass="rounded-button ui-button-plus"
+                                         actionListener="#{mainBean.addOrder()}" update="order"
+                                         oncomplete="editLastDatatableRow();"/>
+                    </f:facet>
+                    <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit"
+                                 saveTitle="Save Row"/>
+                </p:column>
+
+                <p:column headerText="OrderNo">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{order.orderNo}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText id="modelInput" value="#{order.orderNo}"
+                                         style="width:100%"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="AddressLine1">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{order.addressLine1}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{order.addressLine1}" style="width:100%"
+                                         label="Name"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="GrandTotal">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{order.totalAmt}"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{order.totalAmt}" style="width:100%"
+                                         label="Name"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+
+                <p:rowExpansion>
+
+                    <div class="card">
+                        <h5>Row Editing</h5>
+                        <p:dataTable id="lineItem" var="line" value="#{order.lineItems}"
+                                     editable="true" style="margin-bottom:20px"
+                                     rowKey="#{ineItem.productDescription}" rowIndexVar="lineIndex"
+                                     styleClass="myClass${orderIndex}" size="small" showGridlines="true">
+                            <p:ajax event="rowEdit"
+                                    listener="#{mainBean.onRowEditLine(order,line)}"
+                                    update="form:order:${orderIndex}:lineItem form:order"/>
+                            <p:ajax event="rowEditCancel"
+                                    listener="#{mainBean.onRowCancelLine(order,line)}"
+                                    update="form:order:${orderIndex}:lineItem"/>
+
+                            <p:column style="width:6rem">
+
+                                <f:facet name="header">
+
+                                    <p:commandButton value="+"
+                                                     styleClass="rounded-button ui-button-plus"
+                                                     actionListener="#{mainBean.addLine(order)}"
+                                                     update="form:order:${orderIndex}:lineItem"
+                                                     oncomplete="editLastDatatableRowLine(${orderIndex});"/>
+                                </f:facet>
+                                <p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit"
+                                             saveTitle="Save Row"/>
+                            </p:column>
+
+                            <p:column headerText="productDescription">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{line.productDescription}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText id="modelInput"
+                                                     value="#{line.productDescription}" style="width:100%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="quantity">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{line.quantity}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{line.quantity}" style="width:100%"
+                                                     label="Name"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+
+                        </p:dataTable>
+                    </div>
+
+
+                </p:rowExpansion>
+
+            </p:dataTable>
+        </div>
+
+        <script type="text/javascript">
+			function editLastDatatableRow() {
+
+				jQuery('.myclass .ui-datatable-data tr').first().find(
+						'span.ui-icon-pencil').each(function() {
+					jQuery(this).click()
+				});
+			}
+
+			function editLastDatatableRowLine(index) {
+
+				jQuery('.myClass'+index+" "+ '.ui-datatable-data tr').first().find(
+						'span.ui-icon-pencil').each(function() {
+					jQuery(this).click()
+				});
+			}
+
+
+
+        </script>
+    </h:form>
+
+</h:body>
 </html>
